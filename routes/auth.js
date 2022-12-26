@@ -45,27 +45,25 @@ try {
   res.status(201).json({authToken:jwtData})
 } catch (error) {
   console.log(error);
-  res.status(500).send("Some Error")
+  res.status(500).json({error:"Some Error"})
 }
 })
 
 
 //auth User Login
 router.post('/login',[
-  body('email').isEmail(),
-
 ],async(req,res)=>{
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return res.status(400).json({ errors: errors.array() });
+  // }
  
   try {
     let user =await User.findOne({email:req.body.email});
     if(!user){
       res.status(400).json({error:'enter correct email'})
     }
-    const comparepass = bcriptjs.compare(req.body.password,user.password);
+    const comparepass =await bcriptjs.compare(req.body.password,user.password);
     if(!comparepass){
       res.status(400).json({error:'enter correct email'})
     }
@@ -75,7 +73,7 @@ router.post('/login',[
     const jwtData = jwt.sign(user.toJSON(),JWT_Sercet)
     res.status(200).json({authToken:jwtData})
   } catch (error) {
-    res.status(500).send("Some Error")
+    res.status(500).json({error:"some error"})
   }
 
 
