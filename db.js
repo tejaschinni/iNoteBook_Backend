@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const mongooseUri = "mongodb+srv://tejasc:Admin%4012345@cluster0.x15vduz.mongodb.net/test";
+const mongooseUri = "mongodb+srv://tejasc:Admin%4012345@cluster0.x15vduz.mongodb.net/iNoteBook";
 
 
 const connectToMongoose = () =>{
