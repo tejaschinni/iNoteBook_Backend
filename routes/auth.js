@@ -4,7 +4,7 @@ const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
 const bcriptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+var fetchUser = require('../middleware/fetchUser')
 
 
 const JWT_Sercet = "ZGMF";
@@ -53,10 +53,10 @@ try {
 //auth User Login
 router.post('/login',[
 ],async(req,res)=>{
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   return res.status(400).json({ errors: errors.array() });
-  // }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
  
   try {
     let user =await User.findOne({email:req.body.email});
@@ -73,10 +73,21 @@ router.post('/login',[
     const jwtData = jwt.sign(user.toJSON(),JWT_Sercet)
     res.status(200).json({authToken:jwtData})
   } catch (error) {
-    res.status(500).json({error:"some error"})
   }
 
+})
 
+//get userdetails
+router.post('/getuser', fetchUser ,async(req,res)=>{
+  try {
+    userID = req.userID;
+    const user = await User.findById(userID).select('-password');
+    res.status(200).send(user)
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({err:error})
+
+  }
 })
 
 module.exports = router
