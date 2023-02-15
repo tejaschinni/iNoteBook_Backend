@@ -21,6 +21,7 @@ router.post('/createUser',[
 
 ],async(req,res)=> {
   const errors = validationResult(req);
+  let success = false;
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
@@ -29,6 +30,7 @@ try {
   console.log("enter in try");
   let user =await User.findOne({email:req.body.email});
   if(user){
+    success= false;
     return res.status(400).json({error: 'User already Exits'})
   }
   const salt = await bcriptjs.genSalt(10);
@@ -41,8 +43,9 @@ try {
   const data = {
     id:user.id
   }
-  const jwtData = jwt.sign(user.toJSON(),JWT_Sercet)
-  res.status(201).json({authToken:jwtData})
+  const jwtData = jwt.sign(data,JWT_Sercet)
+  success = true;
+  res.status(201).json({success,jwtData})
 } catch (error) {
   console.log(error);
   res.status(500).json({error:"Some Error"})
@@ -53,6 +56,7 @@ try {
 //auth User Login
 router.post('/login',[
 ],async(req,res)=>{
+  let success = false;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -65,13 +69,15 @@ router.post('/login',[
     }
     const comparepass =await bcriptjs.compare(req.body.password,user.password);
     if(!comparepass){
+      success = false;
       res.status(400).json({error:'enter correct email'})
     }
     const payload = {
       id:user.id
     }
-    const jwtData = jwt.sign(user.toJSON(),JWT_Sercet)
-    res.status(200).json({authToken:jwtData})
+    const jwtData = jwt.sign(payload,JWT_Sercet)
+    success = true;
+    res.status(200).json({success,jwtData})
   } catch (error) {
   }
 
